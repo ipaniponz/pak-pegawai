@@ -1,25 +1,33 @@
 {% extends "dokumen_base.html" %}
 {% block title %}PAK - {{ snap.nama }}{% endblock %}
 {% block content %}
-<div class="header-title">Penetapan Angka Kredit</div>
-<div class="header-title">{{ (snap.jabatan_fungsional or "") | upper }}</div>
-<div class="center">NOMOR {{ penetapan.nomor_dokumen.nomor }}</div>
+{% include "_kop.html" %}
+<div class="title-block">
+  <div class="header-title">Penetapan Angka Kredit</div>
+  <div class="header-title">JABATAN FUNGSIONAL {{ (snap.jabatan_fungsional or "") | upper }}</div>
+  <div class="center">NOMOR {{ penetapan.nomor_dokumen.nomor }}</div>
+</div>
 
 <table class="no-border">
   <tr>
-    <td>Instansi: {{ snap.instansi }}</td>
-    <td class="right">
-      Masa Penilaian:
-      {% if snap.rincian_periode %}
-        {{ bulan_nama[snap.rincian_periode[0].bulan] }} {{ snap.rincian_periode[0].tahun }}
-        s.d {{ bulan_nama[snap.rincian_periode[-1].bulan] }} {{ snap.rincian_periode[-1].tahun }}
-      {% endif %}
+    <td class="two-col-label-value">
+      <div class="label-line">Instansi:</div>
+      <div class="value-line">{{ snap.instansi }}</div>
+    </td>
+    <td class="two-col-label-value right">
+      <div class="label-line">Masa Penilaian:</div>
+      <div class="value-line">
+        {% if snap.rincian_periode %}
+          {{ bulan_nama[snap.rincian_periode[0].bulan] }} {{ snap.rincian_periode[0].tahun }}
+          s.d {{ bulan_nama[snap.rincian_periode[-1].bulan] }} {{ snap.rincian_periode[-1].tahun }}
+        {% endif %}
+      </div>
     </td>
   </tr>
 </table>
 
-<p><strong>I. KETERANGAN PERORANGAN</strong></p>
 <table class="identitas-table">
+  <tr><td colspan="3" class="center"><strong>I. KETERANGAN PERORANGAN</strong></td></tr>
   <tr><td class="label">1. Nama</td><td class="colon">:</td><td>{{ snap.nama }}</td></tr>
   <tr><td class="label">2. NIP</td><td class="colon">:</td><td>{{ snap.nip or "-" }}</td></tr>
   <tr><td class="label">3. Nomor Seri Karpeg</td><td class="colon">:</td><td>{{ snap.nomor_karpeg or "-" }}</td></tr>
@@ -40,13 +48,18 @@
     <tr>
       <td class="center">4</td><td>AK Konversi</td>
       <td class="center">{{ "%.3f"|format(penetapan.ak_kumulatif_sebelum) }}</td>
-      <td class="center">{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah - penetapan.ak_kumulatif_sebelum) }}</td>
-      <td class="center">{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah) }}</td>
+      <td class="center">{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah - penetapan.ak_kumulatif_sebelum - penetapan.ak_pendidikan) }}</td>
+      <td class="center">{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah - penetapan.ak_pendidikan) }}</td>
     </tr>
-    <tr><td class="center">5</td><td>AK dari peningkatan pendidikan</td><td class="center">-</td><td class="center">-</td><td class="center">0</td></tr>
+    <tr><td class="center">5</td><td>AK dari peningkatan pendidikan</td><td class="center">-</td><td class="center">-</td><td class="center">{{ "%.3f"|format(penetapan.ak_pendidikan) }}</td></tr>
+    <tr>
+      <td colspan="2" class="right"><strong>JUMLAH ANGKA KREDIT KUMULATIF</strong></td>
+      <td class="center"><strong>{{ "%.3f"|format(penetapan.ak_kumulatif_sebelum) }}</strong></td>
+      <td class="center"><strong>{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah - penetapan.ak_kumulatif_sebelum) }}</strong></td>
+      <td class="center"><strong>{{ "%.3f"|format(penetapan.ak_kumulatif_sesudah) }}</strong></td>
+    </tr>
   </tbody>
 </table>
-<p class="right"><strong>JUMLAH ANGKA KREDIT KUMULATIF: {{ "%.3f"|format(penetapan.ak_kumulatif_sesudah) }}</strong></p>
 
 <table>
   <thead><tr><th>Keterangan</th><th>Pangkat</th><th>Jenjang Jabatan</th></tr></thead>

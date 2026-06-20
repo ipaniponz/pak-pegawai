@@ -215,6 +215,7 @@ class PenetapanAkCreate(BaseModel):
     ak_dasar: Decimal = Decimal("0")
     ak_jf_lama: Decimal = Decimal("0")
     ak_penyesuaian: Decimal = Decimal("0")
+    ak_pendidikan: Decimal = Decimal("0")
     kalimat_penutup: str
 
 
@@ -235,6 +236,7 @@ class PenetapanAkOut(BaseModel):
     ak_dasar: Decimal
     ak_jf_lama: Decimal
     ak_penyesuaian: Decimal
+    ak_pendidikan: Decimal
     pejabat_penilai_id: int
     kalimat_penutup: Optional[str]
     status: str

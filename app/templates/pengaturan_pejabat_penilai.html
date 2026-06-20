@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan Pejabat Penilai{% endblock %}
+{% block content %}
+<h2>Pengaturan Pejabat Penilai</h2>
+<p class="muted">Daftar ini dipakai sebagai pilihan "Pejabat Penilai" saat menerbitkan PAK.</p>
+<table>
+  <thead><tr><th>Nama</th><th>Jabatan</th><th>NIP</th></tr></thead>
+  <tbody>
+    {% for p in rows %}
+    <tr>
+      <td>{{ p.nama }}</td>
+      <td>{{ p.jabatan }}</td>
+      <td>{{ p.nip or "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Tambah Pejabat Penilai</h3>
+<form method="post" action="/pengaturan/pejabat-penilai" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <label>Nama</label>
+  <input type="text" name="nama" required>
+  <label>Jabatan</label>
+  <input type="text" name="jabatan" required>
+  <label>NIP</label>
+  <input type="text" name="nip">
+  <button type="submit">Tambah</button>
+</form>
+{% endblock %}

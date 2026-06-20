@@ -1,6 +1,7 @@
 @media print {
   @page { size: A4; margin: 2cm; }
   body { font-family: 'Times New Roman', serif; font-size: 12pt; }
+  .editor-toolbar { display: none; }
 }
 body { font-family: 'Times New Roman', serif; font-size: 12pt; max-width: 21cm; margin: auto; padding: 1cm; }
 table { width: 100%; border-collapse: collapse; margin: 1em 0; }
@@ -10,8 +11,22 @@ table, th, td { border: 1px solid #000; padding: 4px 8px; }
 .right { text-align: right; }
 .signature-block { margin-top: 3em; text-align: right; }
 .header-title { text-align: center; font-weight: bold; text-transform: uppercase; }
-.identitas-table td { border: none; padding: 1px 4px; }
+.identitas-table { border: 1px solid #000; }
+.identitas-table td { padding: 2px 6px; border: none; border-bottom: 1px solid #ccc; }
 .identitas-table td.label { width: 35%; }
 .identitas-table td.colon { width: 2%; }
+.identitas-table tr:last-child td { border-bottom: none; }
 .footer-sistem { margin-top: 2em; font-size: 9pt; color: #555; }
 .placeholder { color: #b00; font-style: italic; }
+
+.kop-image { text-align: center; }
+.kop-image img { width: 100%; max-height: 160px; object-fit: contain; }
+.kop-line { border: none; border-top: 3px solid #1a3d6d; margin: 4px 0 14px 0; }
+.title-block { margin-bottom: 1em; }
+.two-col-label-value { width: 50%; }
+.two-col-label-value .label-line { font-size: 11pt; }
+.two-col-label-value .value-line { font-weight: bold; }
+
+.editor-toolbar { margin-bottom: 8px; padding: 6px; background: #f0f0f0; border: 1px solid #ccc; border-radius: 4px; display: flex; gap: 4px; flex-wrap: wrap; }
+.editor-toolbar button { padding: 4px 8px; cursor: pointer; }
+.editor-toolbar .sep { width: 1px; background: #ccc; margin: 0 4px; }

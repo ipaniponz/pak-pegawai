@@ -208,6 +208,7 @@ class PenetapanAk(Base):
     ak_dasar = Column(Numeric(12, 6), nullable=False, default=0)
     ak_jf_lama = Column(Numeric(12, 6), nullable=False, default=0)
     ak_penyesuaian = Column(Numeric(12, 6), nullable=False, default=0)
+    ak_pendidikan = Column(Numeric(12, 6), nullable=False, default=0)
     pejabat_penilai_id = Column(Integer, ForeignKey("pejabat_penilai.id"), nullable=False)
     kalimat_penutup = Column(Text)
     file_pdf_path = Column(String)

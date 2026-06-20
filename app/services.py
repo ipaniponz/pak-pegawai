@@ -36,6 +36,15 @@ def get_pengaturan(db: Session) -> dict:
     return {row.key: row.value for row in db.query(PengaturanInstansi).all()}
 
 
+def kop_context(data: dict) -> dict:
+    """Normalisasi data kop (gambar kop surat utuh) dari `pengaturan` (live,
+    dipakai Konversi/Akumulasi) atau `snap` (snapshot PAK) jadi context yang
+    sama, supaya partial _kop.html bisa dipakai apa adanya di ketiga dokumen."""
+    return {
+        "kop_logo": data.get("logo_path"),
+    }
+
+
 def get_nomor_untuk_log(db: Session, predikat_kinerja_log_id: int) -> str | None:
     """Nomor dokumen baru ada setelah PAK benar-benar terbit (lihat 1.4l) --
     sebelum itu, preview Konversi/Akumulasi tampilkan placeholder."""
@@ -296,6 +305,7 @@ def build_snapshot_data(db: Session, pegawai: Pegawai, penetapan: PenetapanAk, i
         "tembusan": [t.isi_tembusan for t in tembusan],
         "instansi": pengaturan.get("instansi"),
         "kota": pengaturan.get("kota"),
+        "logo_path": pengaturan.get("logo_path"),
         "rincian_periode": [
             {
                 "tahun": it.tahun,
@@ -320,6 +330,7 @@ def terbitkan_pak(
     ak_dasar: Decimal,
     ak_jf_lama: Decimal,
     ak_penyesuaian: Decimal,
+    ak_pendidikan: Decimal,
     kalimat_penutup: str,
     pengaturan: dict,
 ) -> PenetapanAk:
@@ -352,7 +363,7 @@ def terbitkan_pak(
     sum_periode_ini = sum((Decimal(str(it.ak_terkonversi)) for it in items), Decimal("0"))
 
     ak_kumulatif_sebelum = ak_dasar + ak_jf_lama + ak_penyesuaian + ak_konversi_sebelum
-    ak_kumulatif_sesudah = ak_kumulatif_sebelum + sum_periode_ini
+    ak_kumulatif_sesudah = ak_kumulatif_sebelum + sum_periode_ini + ak_pendidikan
 
     nomor = generate_nomor_dokumen(db, pegawai.id, tanggal_penetapan.year)
 
@@ -365,6 +376,7 @@ def terbitkan_pak(
         ak_dasar=ak_dasar,
         ak_jf_lama=ak_jf_lama,
         ak_penyesuaian=ak_penyesuaian,
+        ak_pendidikan=ak_pendidikan,
         pejabat_penilai_id=pejabat_penilai_id,
         kalimat_penutup=kalimat_penutup,
         status="terbit",

@@ -1,10 +1,25 @@
 {% extends "base.html" %}
 {% block title %}Pengaturan Instansi{% endblock %}
 {% block content %}
-<h2>Pengaturan Instansi</h2>
+<h2>Pengaturan Instansi & Kop Dokumen</h2>
+
+<h3>Kop Surat</h3>
+{% if rows.get("logo_path") %}
+<p><img src="{{ rows.get('logo_path') }}" alt="Kop Surat" style="max-width:100%;max-height:160px"></p>
+{% else %}
+<p class="muted">Belum ada kop surat diunggah.</p>
+{% endif %}
+<form method="post" action="/pengaturan/instansi/logo" enctype="multipart/form-data" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <label>Unggah/Ganti Kop Surat -- gambar ini harus sudah lengkap (nama instansi, alamat, telepon, dll), karena akan dicetak apa adanya sebagai kop di semua dokumen. (PNG/JPG/GIF/SVG, maks 5 MB)</label>
+  <input type="file" name="logo" accept=".png,.jpg,.jpeg,.gif,.svg" required>
+  <button type="submit">Unggah</button>
+</form>
+
+<h3>Data Instansi</h3>
 <form method="post" action="/pengaturan/instansi" class="form-grid">
   <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
-  <label>Instansi (pemberi kerja, tampil di dokumen)</label>
+  <label>Instansi (nama kementerian/lembaga, tampil di isi dokumen)</label>
   <input type="text" name="instansi" value="{{ rows.get('instansi', '') }}">
   <label>Kota (untuk "Ditetapkan di ...")</label>
   <input type="text" name="kota" value="{{ rows.get('kota', '') }}">

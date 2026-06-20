@@ -6,8 +6,16 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.auth import require_login, require_login_page, verify_csrf_form
+from app.calculations import get_riwayat_jenjang_aktif
 from app.database import get_db
-from app.models import KalimatPenutupReferensi, Pegawai, PejabatPenilai, PenetapanAk, PredikatKinerjaLog
+from app.models import (
+    JenjangReferensi,
+    KalimatPenutupReferensi,
+    Pegawai,
+    PejabatPenilai,
+    PenetapanAk,
+    PredikatKinerjaLog,
+)
 from app.schemas import (
     PejabatPenilaiCreate,
     PejabatPenilaiOut,
@@ -55,6 +63,7 @@ def api_terbitkan_pak(pegawai_id: int, data: PenetapanAkCreate, db: Session = De
             data.ak_dasar,
             data.ak_jf_lama,
             data.ak_penyesuaian,
+            data.ak_pendidikan,
             data.kalimat_penutup,
             get_pengaturan(db),
         )
@@ -110,6 +119,11 @@ def page_penetapan_baru(request: Request, pegawai_id: int, db: Session = Depends
     kalimat_prefill = ""
     if pegawai.status_kepegawaian == "CPNS" and kalimat_default is not None:
         kalimat_prefill = kalimat_default.template
+    aktif = get_riwayat_jenjang_aktif(db, pegawai_id)
+    ak_pangkat_minimal = None
+    if aktif:
+        jenjang_ref = db.get(JenjangReferensi, aktif.jenjang_referensi_id)
+        ak_pangkat_minimal = jenjang_ref.ak_pangkat_minimal if jenjang_ref else None
     return templates.TemplateResponse(
         "penetapan_form.html",
         {
@@ -118,6 +132,7 @@ def page_penetapan_baru(request: Request, pegawai_id: int, db: Session = Depends
             "periode_tersedia": periode_tersedia,
             "pejabat_list": pejabat_list,
             "kalimat_prefill": kalimat_prefill,
+            "ak_pangkat_minimal": ak_pangkat_minimal,
             "error": None,
         },
     )
@@ -143,6 +158,7 @@ async def page_penetapan_baru_submit(request: Request, pegawai_id: int, db: Sess
             Decimal(form.get("ak_dasar") or "0"),
             Decimal(form.get("ak_jf_lama") or "0"),
             Decimal(form.get("ak_penyesuaian") or "0"),
+            Decimal(form.get("ak_pendidikan") or "0"),
             form.get("kalimat_penutup"),
             get_pengaturan(db),
         )

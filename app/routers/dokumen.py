@@ -9,7 +9,7 @@ from app.auth import require_login_page
 from app.calculations import get_riwayat_jenjang_aktif, hitung_kekurangan
 from app.database import get_db
 from app.models import JenjangReferensi, PenetapanAk, PredikatKinerjaLog, RiwayatPangkat, TembusanReferensi
-from app.services import get_nomor_untuk_log, get_pengaturan
+from app.services import get_nomor_untuk_log, get_pengaturan, kop_context
 from app.templating import templates
 
 router = APIRouter()
@@ -18,6 +18,40 @@ BULAN_NAMA = [
     "", "Januari", "Februari", "Maret", "April", "Mei", "Juni",
     "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ]
+
+
+def _group_baris_akumulasi(rows: list[PredikatKinerjaLog]) -> list[dict]:
+    """Gabungkan baris bulanan berurutan dengan predikat & koefisien sama jadi
+    1 baris rentang (mis. 'JUNI-DESEMBER'), mengikuti format asli di
+    'Format sudah Rapih.xlsx' sheet AKUMULASI AK. Tidak digabung lintas tahun
+    atau kalau ada bulan yang terlewat (bukan berurutan)."""
+    groups: list[dict] = []
+    for r in rows:
+        cocok = (
+            groups
+            and groups[-1]["tahun"] == r.tahun
+            and groups[-1]["predikat_id"] == r.predikat_referensi_id
+            and groups[-1]["koefisien"] == r.koefisien_terpakai
+            and groups[-1]["bulan_akhir"] == r.bulan - 1
+        )
+        if cocok:
+            g = groups[-1]
+            g["bulan_akhir"] = r.bulan
+            g["ak_total"] += Decimal(str(r.ak_terkonversi))
+        else:
+            groups.append(
+                {
+                    "tahun": r.tahun,
+                    "bulan_awal": r.bulan,
+                    "bulan_akhir": r.bulan,
+                    "predikat_id": r.predikat_referensi_id,
+                    "predikat_nama": r.predikat_referensi.nama,
+                    "persentase": r.persentase_terpakai,
+                    "koefisien": r.koefisien_terpakai,
+                    "ak_total": Decimal(str(r.ak_terkonversi)),
+                }
+            )
+    return groups
 
 
 def _konteks_pak_untuk_log(db: Session, log: PredikatKinerjaLog):
@@ -70,6 +104,7 @@ def print_konversi_periode(request: Request, log_id: int, db: Session = Depends(
             "bulan_nama": BULAN_NAMA[log.bulan],
             "pak": pak,
             "pengaturan": pengaturan,
+            **kop_context(pengaturan),
             **ident,
         },
     )
@@ -109,10 +144,12 @@ def print_akumulasi(
         {
             "request": request,
             "rows": rows,
+            "groups": _group_baris_akumulasi(rows),
             "bulan_nama": BULAN_NAMA,
             "total": total,
             "pak": pak,
             "pengaturan": pengaturan,
+            **kop_context(pengaturan),
             **ident,
         },
     )
@@ -144,5 +181,6 @@ def print_pak(request: Request, penetapan_id: int, db: Session = Depends(get_db)
             "kekurangan_jenjang": kekurangan_jenjang,
             "bulan_nama": BULAN_NAMA,
             "now": datetime.now(),
+            **kop_context(snap),
         },
     )

@@ -1,20 +1,30 @@
 {% extends "dokumen_base.html" %}
 {% block title %}Konversi Predikat Kinerja - {{ pegawai.nama }}{% endblock %}
 {% block content %}
-<div contenteditable="true">
-<div class="header-title">Konversi Predikat Kinerja ke Angka Kredit</div>
-<div class="header-title">{{ (pegawai.jabatan_fungsional or "") | upper }}</div>
-<div class="center">NOMOR {{ pak.nomor_dokumen.nomor if pak else "" }}{% if not pak %}<span class="placeholder">(nomor akan diberikan saat penetapan)</span>{% endif %}</div>
+{% include "_kop.html" %}
+{% include "_editor_toolbar.html" %}
+<div contenteditable="true" id="editable-area">
+<div class="title-block">
+  <div class="header-title">Konversi Predikat Kinerja ke Angka Kredit</div>
+  <div class="header-title">JABATAN FUNGSIONAL {{ (pegawai.jabatan_fungsional or "") | upper }}</div>
+  <div class="center">NOMOR {{ pak.nomor_dokumen.nomor if pak else "" }}{% if not pak %}<span class="placeholder">(nomor akan diberikan saat penetapan)</span>{% endif %}</div>
+</div>
 
 <table class="no-border">
   <tr>
-    <td>Instansi: {{ pengaturan.get("instansi", "") }}</td>
-    <td class="right">Periode: {{ bulan_nama }} {{ log.tahun }}</td>
+    <td class="two-col-label-value">
+      <div class="label-line">Instansi :</div>
+      <div class="value-line">{{ pengaturan.get("instansi", "") }}</div>
+    </td>
+    <td class="two-col-label-value right">
+      <div class="label-line">Periode:</div>
+      <div class="value-line">{{ bulan_nama }} {{ log.tahun }}</div>
+    </td>
   </tr>
 </table>
 
-<p><strong>PEJABAT FUNGSIONAL YANG DINILAI</strong></p>
 <table class="identitas-table">
+  <tr><td colspan="3" class="center"><strong>PEJABAT FUNGSIONAL YANG DINILAI</strong></td></tr>
   <tr><td class="label">1. Nama</td><td class="colon">:</td><td>{{ pegawai.nama }}</td></tr>
   <tr><td class="label">2. NIP</td><td class="colon">:</td><td>{{ pegawai.nip or "-" }}</td></tr>
   <tr><td class="label">3. Nomor Seri Karpeg</td><td class="colon">:</td><td>{{ pegawai.nomor_karpeg or "-" }}</td></tr>
@@ -29,13 +39,22 @@
 <div class="header-title">Konversi Predikat Kinerja ke Angka Kredit</div>
 <table>
   <thead>
-    <tr><th>Hasil Penilaian Kinerja (Predikat)</th><th>Prosentase</th><th>Koefisien per Tahun</th><th>AK yang Didapat</th></tr>
-    <tr class="center"><td>1</td><td>2</td><td>3</td><td>4 (kolom 2 x kolom 3)</td></tr>
+    <tr>
+      <th colspan="2">Hasil Penilaian Kinerja</th>
+      <th>Koefisien per Tahun</th>
+      <th>Angka Kredit yang Didapat<br><span class="muted">(kolom 2 x kolom 3)</span></th>
+    </tr>
+    <tr class="center">
+      <th>Predikat</th>
+      <th>Prosentase</th>
+      <th>3</th>
+      <th>4</th>
+    </tr>
   </thead>
   <tbody>
     <tr class="center">
-      <td>{{ log.predikat_referensi.nama }}</td>
-      <td>{{ log.persentase_terpakai }}</td>
+      <td>{{ log.predikat_referensi.nama | upper }}</td>
+      <td>{{ (log.persentase_terpakai * 100) | round | int }}%</td>
       <td>{{ log.koefisien_terpakai }}</td>
       <td>{{ "%.3f"|format(log.ak_terkonversi) }}</td>
     </tr>
@@ -57,4 +76,5 @@
   {% endfor %}
 </ol>
 </div>
+<script>initEditorToolbar(".editor-toolbar", "#editable-area");</script>
 {% endblock %}

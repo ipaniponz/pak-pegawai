@@ -44,10 +44,30 @@
   <label>AK Penyesuaian/Penyetaraan (default 0)</label>
   <input type="text" name="ak_penyesuaian" value="0">
 
+  <label>
+    <input type="checkbox" id="ada-pendidikan" {{ "disabled" if ak_pangkat_minimal is none }}>
+    Ada peningkatan pendidikan?
+    {% if ak_pangkat_minimal is none %}<span class="muted">(jenjang aktif tidak punya AK pangkat minimal)</span>{% endif %}
+  </label>
+  <label>AK dari Peningkatan Pendidikan (default 0 -- 25% dari AK pangkat minimal jenjang aktif kalau dicentang di atas, tetap bisa diedit manual)</label>
+  <input type="text" name="ak_pendidikan" id="ak-pendidikan" value="0">
+
   <label>Kalimat Penutup (boleh diedit manual, wajib diisi)</label>
   <textarea name="kalimat_penutup" rows="4" required>{{ kalimat_prefill }}</textarea>
 
   <button type="submit">Terbitkan PAK</button>
 </form>
+
+<script>
+(function () {
+  var akPangkatMinimal = {{ ak_pangkat_minimal if ak_pangkat_minimal is not none else "null" }};
+  var checkbox = document.getElementById("ada-pendidikan");
+  var input = document.getElementById("ak-pendidikan");
+  if (!checkbox || akPangkatMinimal === null) return;
+  checkbox.addEventListener("change", function () {
+    input.value = checkbox.checked ? (akPangkatMinimal * 0.25).toFixed(3) : "0";
+  });
+})();
+</script>
 {% endif %}
 {% endblock %}
