@@ -3,6 +3,9 @@
 {% block content %}
 <h2>Daftar Pegawai</h2>
 <p><a href="/pegawai/baru" class="btn">+ Tambah Pegawai</a></p>
+{% if not pegawai_list %}
+<p class="muted">Belum ada data pegawai. Klik "+ Tambah Pegawai" di atas untuk menambahkan yang pertama.</p>
+{% else %}
 <table>
   <thead>
     <tr><th>Nama</th><th>NIP</th><th>Jabatan</th><th>Kategori</th><th>Status</th><th>Data Lengkap</th></tr>
@@ -20,4 +23,5 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 {% endblock %}

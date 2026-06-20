@@ -2,6 +2,10 @@
 {% block title %}Dashboard{% endblock %}
 {% block content %}
 <h2>Dashboard Monitoring Angka Kredit</h2>
+<p class="muted">Daftar pegawai aktif dengan status AK terkini. Klik nama untuk kelola Predikat Kinerja & Terbitkan PAK.</p>
+{% if not rows %}
+<p class="muted">Belum ada pegawai aktif. <a href="/pegawai/baru">Tambah pegawai pertama</a> untuk mulai.</p>
+{% else %}
 <table>
   <thead>
     <tr>
@@ -41,4 +45,5 @@
     {% endfor %}
   </tbody>
 </table>
+{% endif %}
 {% endblock %}

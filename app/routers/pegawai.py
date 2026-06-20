@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from app.auth import require_login, require_login_page, verify_csrf_form
 from app.calculations import get_riwayat_jenjang_aktif, hitung_ak_kumulatif
 from app.database import get_db
-from app.models import JenjangReferensi, Pegawai, PredikatKinerjaLog, RiwayatJenjang, RiwayatPangkat
+from app.models import JenjangReferensi, Pegawai, PenetapanAk, PredikatKinerjaLog, RiwayatJenjang, RiwayatPangkat
 from app.schemas import PegawaiCreate, PegawaiOut, PegawaiUpdate, RiwayatJenjangCreate, RiwayatPangkatCreate
 from app.services import ValidationError, add_riwayat_jenjang, add_riwayat_pangkat, create_pegawai, set_data_lengkap, update_pegawai
 from app.templating import templates
@@ -140,10 +140,15 @@ def page_detail_pegawai(request: Request, pegawai_id: int, db: Session = Depends
         .order_by(PredikatKinerjaLog.tahun.desc(), PredikatKinerjaLog.bulan.desc())
         .all()
     )
-    bisa_terbitkan_pak = any(
-        log.status == "disetujui"
-        for log in logs
+    sudah_dipakai_ids = {
+        item.predikat_kinerja_log_id
+        for pak in db.query(PenetapanAk).filter(PenetapanAk.pegawai_id == pegawai_id, PenetapanAk.status != "dibatalkan")
+        for item in pak.items
+    }
+    jumlah_periode_siap_pak = sum(
+        1 for log in logs if log.status == "disetujui" and log.id not in sudah_dipakai_ids
     )
+    bisa_terbitkan_pak = jumlah_periode_siap_pak > 0
     return templates.TemplateResponse(
         "pegawai_detail.html",
         {
@@ -154,6 +159,7 @@ def page_detail_pegawai(request: Request, pegawai_id: int, db: Session = Depends
             "riwayat_pangkat": riwayat_pangkat,
             "logs": logs,
             "bisa_terbitkan_pak": bisa_terbitkan_pak,
+            "jumlah_periode_siap_pak": jumlah_periode_siap_pak,
             "jenjang_list": db.query(JenjangReferensi).order_by(JenjangReferensi.kategori, JenjangReferensi.urutan).all(),
         },
     )

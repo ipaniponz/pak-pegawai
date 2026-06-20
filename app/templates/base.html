@@ -9,11 +9,17 @@
   <nav>
     <a href="/">Dashboard</a>
     <a href="/pegawai">Pegawai</a>
-    <a href="/pengaturan/jenjang-referensi">Jenjang</a>
-    <a href="/pengaturan/predikat-kinerja">Predikat</a>
-    <a href="/pengaturan/tembusan">Tembusan</a>
-    <a href="/pengaturan/kalimat-penutup">Kalimat Penutup</a>
-    <a href="/pengaturan/instansi">Instansi</a>
+    <details class="nav-settings">
+      <summary>Pengaturan</summary>
+      <div class="nav-settings-menu">
+        <a href="/pengaturan/jenjang-referensi">Jenjang</a>
+        <a href="/pengaturan/predikat-kinerja">Predikat</a>
+        <a href="/pengaturan/tembusan">Tembusan</a>
+        <a href="/pengaturan/pejabat-penilai">Pejabat Penilai</a>
+        <a href="/pengaturan/kalimat-penutup">Kalimat Penutup</a>
+        <a href="/pengaturan/instansi">Instansi</a>
+      </div>
+    </details>
     <form class="inline" method="post" action="/logout" style="float:right">
       <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
       <button type="submit" class="secondary">Logout</button>

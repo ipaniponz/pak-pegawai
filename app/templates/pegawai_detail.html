@@ -2,6 +2,18 @@
 {% block title %}{{ pegawai.nama }}{% endblock %}
 {% block content %}
 <h2>{{ pegawai.nama }}</h2>
+<div class="workflow-steps">
+  <div class="step {{ 'done' if pegawai.data_lengkap else 'active' }}">
+    <span class="step-num">1</span> Data Pegawai
+  </div>
+  <div class="step {{ 'done' if jumlah_periode_siap_pak > 0 else ('active' if pegawai.data_lengkap else 'pending') }}">
+    <span class="step-num">2</span> Predikat Kinerja
+    {% if jumlah_periode_siap_pak > 0 %}<span class="muted">({{ jumlah_periode_siap_pak }} periode siap PAK)</span>{% endif %}
+  </div>
+  <div class="step {{ 'active' if jumlah_periode_siap_pak > 0 else 'pending' }}">
+    <span class="step-num">3</span> Terbitkan PAK
+  </div>
+</div>
 <p>
   <a href="/pegawai/{{ pegawai.id }}/edit" class="btn secondary">Edit Data Pegawai</a>
   {% if not pegawai.data_lengkap %}
