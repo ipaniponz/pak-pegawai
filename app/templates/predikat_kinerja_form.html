@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Input Predikat Kinerja{% endblock %}
+{% block content %}
+<h2>Input Predikat Kinerja - {{ pegawai.nama }}</h2>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+<div id="persentase-data" data-persentase='{ {% for p in predikat_list %}"{{ p.id }}": {{ p.persentase }}{{ "," if not loop.last }}{% endfor %} }' data-koefisien="{{ koefisien_aktif or 0 }}"></div>
+
+<h3>Mode Satu Bulan</h3>
+<form method="post" action="/pegawai/{{ pegawai.id }}/predikat-kinerja/baru" class="form-grid" id="form-single">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <input type="hidden" name="mode" value="single">
+  <label>Tahun</label>
+  <input type="number" name="tahun" id="tahun-single" required min="2000" max="2100" value="{{ now_year if now_year else '' }}">
+  <label>Bulan</label>
+  <select name="bulan" id="bulan-single" required>
+    {% for b in range(1, 13) %}<option value="{{ b }}">{{ b }}</option>{% endfor %}
+  </select>
+  <label>Predikat</label>
+  <select name="predikat_referensi_id" id="predikat-single" required>
+    {% for p in predikat_list %}<option value="{{ p.id }}">{{ p.nama }} ({{ (p.persentase * 100)|round|int }}%)</option>{% endfor %}
+  </select>
+  <p>Estimasi AK terkonversi: <strong id="preview-single">-</strong></p>
+  <button type="submit">Simpan</button>
+</form>
+
+<h3>Mode Batch (Isi Satu Tahun Sekaligus)</h3>
+<form method="post" action="/pegawai/{{ pegawai.id }}/predikat-kinerja/baru" class="form-grid" style="max-width:700px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <input type="hidden" name="mode" value="batch">
+  <label>Tahun</label>
+  <input type="number" name="tahun_batch" required min="2000" max="2100">
+  <table>
+    <thead><tr><th>Bulan</th><th>Predikat (kosongkan kalau tidak diisi)</th></tr></thead>
+    <tbody>
+      {% for b in range(1, 13) %}
+      <tr>
+        <td>{{ b }}</td>
+        <td>
+          <select name="predikat_bulan_{{ b }}">
+            <option value="">- tidak diisi -</option>
+            {% for p in predikat_list %}<option value="{{ p.id }}">{{ p.nama }}</option>{% endfor %}
+          </select>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit">Simpan Batch</button>
+</form>
+
+<script>
+(function () {
+  var dataEl = document.getElementById("persentase-data");
+  var persentase = JSON.parse(dataEl.dataset.persentase);
+  var koefisien = parseFloat(dataEl.dataset.koefisien || "0");
+
+  function updatePreview() {
+    var pid = document.getElementById("predikat-single").value;
+    var pct = persentase[pid];
+    var el = document.getElementById("preview-single");
+    if (pct === undefined || !koefisien) { el.textContent = "-"; return; }
+    var ak = (koefisien / 12) * pct;
+    el.textContent = ak.toFixed(3);
+  }
+  document.getElementById("predikat-single").addEventListener("change", updatePreview);
+  updatePreview();
+})();
+</script>
+{% endblock %}

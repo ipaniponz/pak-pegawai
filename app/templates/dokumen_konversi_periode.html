@@ -1,0 +1,60 @@
+{% extends "dokumen_base.html" %}
+{% block title %}Konversi Predikat Kinerja - {{ pegawai.nama }}{% endblock %}
+{% block content %}
+<div contenteditable="true">
+<div class="header-title">Konversi Predikat Kinerja ke Angka Kredit</div>
+<div class="header-title">{{ (pegawai.jabatan_fungsional or "") | upper }}</div>
+<div class="center">NOMOR {{ pak.nomor_dokumen.nomor if pak else "" }}{% if not pak %}<span class="placeholder">(nomor akan diberikan saat penetapan)</span>{% endif %}</div>
+
+<table class="no-border">
+  <tr>
+    <td>Instansi: {{ pengaturan.get("instansi", "") }}</td>
+    <td class="right">Periode: {{ bulan_nama }} {{ log.tahun }}</td>
+  </tr>
+</table>
+
+<p><strong>PEJABAT FUNGSIONAL YANG DINILAI</strong></p>
+<table class="identitas-table">
+  <tr><td class="label">1. Nama</td><td class="colon">:</td><td>{{ pegawai.nama }}</td></tr>
+  <tr><td class="label">2. NIP</td><td class="colon">:</td><td>{{ pegawai.nip or "-" }}</td></tr>
+  <tr><td class="label">3. Nomor Seri Karpeg</td><td class="colon">:</td><td>{{ pegawai.nomor_karpeg or "-" }}</td></tr>
+  <tr><td class="label">4. Tempat / Tanggal Lahir</td><td class="colon">:</td><td>{{ pegawai.tempat_lahir or "-" }}, {{ pegawai.tanggal_lahir or "-" }}</td></tr>
+  <tr><td class="label">5. Jenis Kelamin</td><td class="colon">:</td><td>{{ pegawai.jenis_kelamin or "-" }}</td></tr>
+  <tr><td class="label">6. Pangkat / Golongan Ruang / TMT</td><td class="colon">:</td>
+      <td>{{ pangkat_aktif.pangkat if pangkat_aktif else "-" }} ({{ pangkat_aktif.golongan_ruang if pangkat_aktif else "-" }}) / {{ pangkat_aktif.tmt_pangkat if pangkat_aktif else "-" }}</td></tr>
+  <tr><td class="label">7. Jabatan/TMT</td><td class="colon">:</td><td>{{ pegawai.jabatan_fungsional or "-" }} {{ jenjang_ref.nama_jenjang if jenjang_ref else "" }} / {{ pegawai.tmt_jabatan or "-" }}</td></tr>
+  <tr><td class="label">8. Unit Kerja</td><td class="colon">:</td><td>{{ pegawai.unit_kerja or "-" }}</td></tr>
+</table>
+
+<div class="header-title">Konversi Predikat Kinerja ke Angka Kredit</div>
+<table>
+  <thead>
+    <tr><th>Hasil Penilaian Kinerja (Predikat)</th><th>Prosentase</th><th>Koefisien per Tahun</th><th>AK yang Didapat</th></tr>
+    <tr class="center"><td>1</td><td>2</td><td>3</td><td>4 (kolom 2 x kolom 3)</td></tr>
+  </thead>
+  <tbody>
+    <tr class="center">
+      <td>{{ log.predikat_referensi.nama }}</td>
+      <td>{{ log.persentase_terpakai }}</td>
+      <td>{{ log.koefisien_terpakai }}</td>
+      <td>{{ "%.3f"|format(log.ak_terkonversi) }}</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="signature-block">
+  Ditetapkan di {{ pengaturan.get("kota", "") }}<br>
+  Pada tanggal {{ pak.tanggal_penetapan if pak else "-" }}<br><br><br>
+  Pejabat Penilai Kinerja,<br><br><br><br>
+  {{ pak.pejabat_penilai.nama if pak else "-" }}<br>
+  NIP {{ pak.pejabat_penilai.nip if pak else "-" }}
+</div>
+
+<p>Tembusan disampaikan kepada:</p>
+<ol>
+  {% for t in tembusan %}
+  <li>{{ t.isi_tembusan }}</li>
+  {% endfor %}
+</ol>
+</div>
+{% endblock %}

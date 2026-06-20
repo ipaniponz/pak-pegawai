@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan Tembusan{% endblock %}
+{% block content %}
+<h2>Pengaturan Tembusan</h2>
+<table>
+  <thead><tr><th>Jabatan Fungsional</th><th>Urutan</th><th>Isi Tembusan</th><th></th></tr></thead>
+  <tbody>
+    {% for t in rows %}
+    <tr>
+      <td>{{ t.jabatan_fungsional }}</td>
+      <td>{{ t.urutan }}</td>
+      <td>{{ t.isi_tembusan }}</td>
+      <td>
+        <form class="inline" method="post" action="/pengaturan/tembusan/{{ t.id }}/hapus" onsubmit="return confirm('Hapus tembusan ini?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+          <button type="submit" class="danger">Hapus</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<h3>Tambah Tembusan</h3>
+<form method="post" action="/pengaturan/tembusan" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <label>Jabatan Fungsional (nama dasar resmi, harus sama persis dgn field pegawai)</label>
+  <input type="text" name="jabatan_fungsional" required>
+  <label>Urutan</label>
+  <input type="number" name="urutan" required min="1">
+  <label>Isi Tembusan</label>
+  <input type="text" name="isi_tembusan" required>
+  <button type="submit">Tambah</button>
+</form>
+{% endblock %}

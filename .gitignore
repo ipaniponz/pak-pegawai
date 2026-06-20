@@ -1,0 +1,10 @@
+data/*
+!data/.gitkeep
+__pycache__/
+*.pyc
+.env
+*.xlsx
+flagged_rows*.csv
+venv/
+secrets.bat
+.pytest_cache/

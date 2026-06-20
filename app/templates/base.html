@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}Monitoring Angka Kredit{% endblock %} - Biro Hukum</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <nav>
+    <a href="/">Dashboard</a>
+    <a href="/pegawai">Pegawai</a>
+    <a href="/pengaturan/jenjang-referensi">Jenjang</a>
+    <a href="/pengaturan/predikat-kinerja">Predikat</a>
+    <a href="/pengaturan/tembusan">Tembusan</a>
+    <a href="/pengaturan/kalimat-penutup">Kalimat Penutup</a>
+    <a href="/pengaturan/instansi">Instansi</a>
+    <form class="inline" method="post" action="/logout" style="float:right">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+      <button type="submit" class="secondary">Logout</button>
+    </form>
+  </nav>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}{{ pegawai.nama }}{% endblock %}
+{% block content %}
+<h2>{{ pegawai.nama }}</h2>
+<p>
+  <a href="/pegawai/{{ pegawai.id }}/edit" class="btn secondary">Edit Data Pegawai</a>
+  {% if not pegawai.data_lengkap %}
+  <form class="inline" method="post" action="/pegawai/{{ pegawai.id }}/data-lengkap">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <button type="submit">Tandai Data Lengkap</button>
+  </form>
+  {% else %}
+  <span class="badge disetujui">Data Lengkap</span>
+  {% endif %}
+</p>
+
+<table class="identitas-table">
+  <tr><td class="label">NIP</td><td class="colon">:</td><td>{{ pegawai.nip or "-" }}</td></tr>
+  <tr><td class="label">Kategori JF</td><td class="colon">:</td><td>{{ pegawai.kategori_jf }}</td></tr>
+  <tr><td class="label">Jabatan Fungsional</td><td class="colon">:</td><td>{{ pegawai.jabatan_fungsional or "-" }}</td></tr>
+  <tr><td class="label">Substansi</td><td class="colon">:</td><td>{{ pegawai.substansi or "-" }}</td></tr>
+  <tr><td class="label">Status Kepegawaian</td><td class="colon">:</td><td>{{ pegawai.status_kepegawaian }}</td></tr>
+  <tr><td class="label">AK Kumulatif Saat Ini</td><td class="colon">:</td><td><strong>{{ "%.3f"|format(ak_kumulatif) if ak_kumulatif is not none else "-" }}</strong></td></tr>
+</table>
+
+<h3>Riwayat Jenjang</h3>
+<table>
+  <thead><tr><th>Jenjang</th><th>Tanggal Mulai</th><th>Tanggal Selesai</th><th>AK Awal Jenjang</th><th>SK Referensi</th></tr></thead>
+  <tbody>
+    {% for r in riwayat_jenjang %}
+    <tr>
+      <td>{{ r.jenjang_referensi.nama_jenjang }}</td>
+      <td>{{ r.tanggal_mulai }}</td>
+      <td>{{ r.tanggal_selesai or "Aktif" }}</td>
+      <td>{{ r.ak_awal_jenjang }}</td>
+      <td>{{ r.sk_referensi or "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<details>
+  <summary>+ Catat Naik Jenjang</summary>
+  <form method="post" action="/pegawai/{{ pegawai.id }}/riwayat-jenjang" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <label>Jenjang Baru</label>
+    <select name="jenjang_referensi_id" required>
+      {% for j in jenjang_list %}
+      <option value="{{ j.id }}">{{ j.kategori }} - {{ j.nama_jenjang }}</option>
+      {% endfor %}
+    </select>
+    <label>Tanggal Mulai</label>
+    <input type="date" name="tanggal_mulai" required>
+    <label>AK Awal Jenjang (baseline)</label>
+    <input type="text" name="ak_awal_jenjang" value="0">
+    <label>SK Referensi</label>
+    <input type="text" name="sk_referensi">
+    <button type="submit">Simpan</button>
+  </form>
+</details>
+
+<h3>Riwayat Pangkat</h3>
+<table>
+  <thead><tr><th>Pangkat</th><th>Golongan Ruang</th><th>TMT</th><th>Tanggal Selesai</th><th>SK Referensi</th></tr></thead>
+  <tbody>
+    {% for r in riwayat_pangkat %}
+    <tr>
+      <td>{{ r.pangkat }}</td>
+      <td>{{ r.golongan_ruang }}</td>
+      <td>{{ r.tmt_pangkat }}</td>
+      <td>{{ r.tanggal_selesai or "Aktif" }}</td>
+      <td>{{ r.sk_referensi or "-" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<details>
+  <summary>+ Catat Kenaikan Pangkat</summary>
+  <form method="post" action="/pegawai/{{ pegawai.id }}/riwayat-pangkat" class="form-grid">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+    <label>Pangkat</label>
+    <input type="text" name="pangkat" required placeholder="mis. Penata Muda">
+    <label>Golongan Ruang</label>
+    <input type="text" name="golongan_ruang" required placeholder="mis. III/a">
+    <label>TMT Pangkat</label>
+    <input type="date" name="tmt_pangkat" required>
+    <label>SK Referensi</label>
+    <input type="text" name="sk_referensi">
+    <button type="submit">Simpan</button>
+  </form>
+</details>
+
+<h3>Riwayat Predikat Kinerja</h3>
+<p>
+  <a href="/pegawai/{{ pegawai.id }}/predikat-kinerja/baru" class="btn">+ Input Predikat Kinerja Baru</a>
+  {% if bisa_terbitkan_pak %}
+  <a href="/pegawai/{{ pegawai.id }}/penetapan-ak/baru" class="btn">Terbitkan PAK</a>
+  {% endif %}
+</p>
+<table>
+  <thead><tr><th>Bulan/Tahun</th><th>Predikat</th><th>AK Terkonversi</th><th>Status</th><th>Aksi</th></tr></thead>
+  <tbody>
+    {% for log in logs %}
+    <tr>
+      <td>{{ log.bulan }}/{{ log.tahun }}</td>
+      <td>{{ log.predikat_referensi.nama }}</td>
+      <td>{{ log.ak_terkonversi }}</td>
+      <td><span class="badge {{ log.status }}">{{ log.status }}</span></td>
+      <td>
+        <a href="/dokumen/konversi-periode/{{ log.id }}/print" target="_blank">Print</a>
+        {% if log.status == "draft" %}
+        <form class="inline" method="post" action="/predikat-kinerja/{{ log.id }}/status">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+          <input type="hidden" name="status" value="disetujui">
+          <button type="submit">Setujui</button>
+        </form>
+        {% endif %}
+        {% if log.status != "dibatalkan" %}
+        <form class="inline" method="post" action="/predikat-kinerja/{{ log.id }}/status" onsubmit="return confirm('Batalkan baris ini?')">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+          <input type="hidden" name="status" value="dibatalkan">
+          <input type="text" name="alasan" placeholder="alasan" required style="width:100px">
+          <button type="submit" class="danger">Batalkan</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

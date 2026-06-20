@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan Kalimat Penutup{% endblock %}
+{% block content %}
+<h2>Pengaturan Kalimat Penutup PAK</h2>
+<p class="muted">Hanya tambahkan kondisi baru (kenaikan pangkat, kenaikan jenjang, dst.) kalau sudah ada redaksi resmi yang terverifikasi. Jangan menebak redaksi.</p>
+<table>
+  <thead><tr><th>Kondisi</th><th>Template</th><th></th></tr></thead>
+  <tbody>
+    {% for k in rows %}
+    <tr>
+      <td>{{ k.kondisi }}</td>
+      <td><textarea name="template" form="kform{{ k.id }}" rows="2" style="width:100%">{{ k.template }}</textarea></td>
+      <td><button type="submit" form="kform{{ k.id }}">Simpan</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% for k in rows %}
+<form id="kform{{ k.id }}" method="post" action="/pengaturan/kalimat-penutup/{{ k.id }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+</form>
+{% endfor %}
+
+<h3>Tambah Kondisi Baru</h3>
+<form method="post" action="/pengaturan/kalimat-penutup" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <label>Kondisi (kode singkat, mis. kenaikan_pangkat)</label>
+  <input type="text" name="kondisi" required>
+  <label>Template (boleh pakai placeholder {jabatan_fungsional}, {pangkat}, dst.)</label>
+  <textarea name="template" rows="3" required></textarea>
+  <button type="submit">Tambah</button>
+</form>
+{% endblock %}

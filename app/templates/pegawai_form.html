@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}{{ "Edit" if pegawai else "Tambah" }} Pegawai{% endblock %}
+{% block content %}
+<h2>{{ "Edit Pegawai" if pegawai else "Tambah Pegawai" }}</h2>
+<form method="post" action="{{ ('/pegawai/' ~ pegawai.id ~ '/edit') if pegawai else '/pegawai/baru' }}" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+
+  <label>Nama</label>
+  <input type="text" name="nama" value="{{ pegawai.nama if pegawai else '' }}" required>
+
+  <label>Kategori JF</label>
+  <select name="kategori_jf" required>
+    {% for k in ["Keahlian", "Keterampilan", "Struktural"] %}
+    <option value="{{ k }}" {{ "selected" if pegawai and pegawai.kategori_jf == k }}>{{ k }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Status Kepegawaian</label>
+  <select name="status_kepegawaian">
+    {% for k in ["PNS", "CPNS"] %}
+    <option value="{{ k }}" {{ "selected" if pegawai and pegawai.status_kepegawaian == k }}>{{ k }}</option>
+    {% endfor %}
+  </select>
+
+  <label>NIP (boleh kosong kalau belum ada)</label>
+  <input type="text" name="nip" value="{{ pegawai.nip if pegawai and pegawai.nip else '' }}">
+
+  <label>Jabatan Fungsional (nama dasar, tanpa jenjang)</label>
+  <input type="text" name="jabatan_fungsional" value="{{ pegawai.jabatan_fungsional if pegawai and pegawai.jabatan_fungsional else '' }}">
+
+  <label>Substansi</label>
+  <input type="text" name="substansi" value="{{ pegawai.substansi if pegawai and pegawai.substansi else '' }}">
+
+  <label>Unit Kerja</label>
+  <input type="text" name="unit_kerja" value="{{ pegawai.unit_kerja if pegawai and pegawai.unit_kerja else '' }}">
+
+  {% if pegawai %}
+  <label>Nomor Karpeg</label>
+  <input type="text" name="nomor_karpeg" value="{{ pegawai.nomor_karpeg or '' }}">
+
+  <label>Tempat Lahir</label>
+  <input type="text" name="tempat_lahir" value="{{ pegawai.tempat_lahir or '' }}">
+
+  <label>Tanggal Lahir</label>
+  <input type="date" name="tanggal_lahir" value="{{ pegawai.tanggal_lahir or '' }}">
+
+  <label>Jenis Kelamin</label>
+  <select name="jenis_kelamin">
+    <option value="">-</option>
+    <option value="Laki-Laki" {{ "selected" if pegawai.jenis_kelamin == "Laki-Laki" }}>Laki-Laki</option>
+    <option value="Perempuan" {{ "selected" if pegawai.jenis_kelamin == "Perempuan" }}>Perempuan</option>
+  </select>
+  {% endif %}
+
+  <button type="submit">Simpan</button>
+</form>
+{% endblock %}

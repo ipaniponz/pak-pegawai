@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <title>Login - Monitoring Angka Kredit</title>
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <main style="max-width:360px; margin-top: 4em;">
+    <h2>Login Admin</h2>
+    {% if error %}<div class="error">{{ error }}</div>{% endif %}
+    <form method="post" action="/login" class="form-grid">
+      <label>Username</label>
+      <input type="text" name="username" required autofocus>
+      <label>Password</label>
+      <input type="password" name="password" required>
+      <button type="submit">Masuk</button>
+    </form>
+  </main>
+</body>
+</html>

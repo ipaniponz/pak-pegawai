@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Daftar Pegawai{% endblock %}
+{% block content %}
+<h2>Daftar Pegawai</h2>
+<p><a href="/pegawai/baru" class="btn">+ Tambah Pegawai</a></p>
+<table>
+  <thead>
+    <tr><th>Nama</th><th>NIP</th><th>Jabatan</th><th>Kategori</th><th>Status</th><th>Data Lengkap</th></tr>
+  </thead>
+  <tbody>
+    {% for p in pegawai_list %}
+    <tr>
+      <td><a href="/pegawai/{{ p.id }}">{{ p.nama }}</a></td>
+      <td>{{ p.nip or "-" }}</td>
+      <td>{{ p.jabatan_fungsional or "-" }}</td>
+      <td>{{ p.kategori_jf }}</td>
+      <td>{{ p.status }}</td>
+      <td>{{ "Ya" if p.data_lengkap else "Belum" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

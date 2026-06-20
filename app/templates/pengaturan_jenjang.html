@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan Jenjang Referensi{% endblock %}
+{% block content %}
+<h2>Pengaturan Jenjang Referensi</h2>
+<p class="muted">Perubahan di sini hanya berlaku untuk PAK yang diterbitkan SETELAH perubahan -- PAK yang sudah terbit tetap aman karena sudah di-snapshot.</p>
+<table>
+  <thead><tr><th>Kategori</th><th>Jenjang</th><th>Koefisien AK/Tahun</th><th>AK Min. Jenjang</th><th>AK Min. Pangkat</th><th></th></tr></thead>
+  <tbody>
+    {% for j in rows %}
+    <tr>
+      <td>{{ j.kategori }}</td>
+      <td>{{ j.nama_jenjang }}</td>
+      <td><input type="text" name="koefisien_ak_tahun" form="jform{{ j.id }}" value="{{ j.koefisien_ak_tahun }}" style="width:80px"></td>
+      <td><input type="text" name="ak_kumulatif_minimal" form="jform{{ j.id }}" value="{{ j.ak_kumulatif_minimal or '' }}" style="width:80px"></td>
+      <td><input type="text" name="ak_pangkat_minimal" form="jform{{ j.id }}" value="{{ j.ak_pangkat_minimal or '' }}" style="width:80px"></td>
+      <td><button type="submit" form="jform{{ j.id }}">Simpan</button></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% for j in rows %}
+<form id="jform{{ j.id }}" method="post" action="/pengaturan/jenjang-referensi/{{ j.id }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+</form>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Dashboard Monitoring Angka Kredit</h2>
+<table>
+  <thead>
+    <tr>
+      <th>Nama</th>
+      <th>Jabatan</th>
+      <th>Jenjang Aktif</th>
+      <th>AK Kumulatif</th>
+      <th>AK Target Jenjang</th>
+      <th>Kekurangan/Kelebihan</th>
+      <th>Keterangan</th>
+      <th>Potensi Tahun (SB/B/BP)</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for r in rows %}
+    <tr>
+      <td><a href="/pegawai/{{ r.pegawai_id }}">{{ r.nama }}</a></td>
+      <td>{{ r.jabatan_fungsional or "-" }}</td>
+      <td>{{ r.jenjang_aktif or "-" }}</td>
+      <td>{{ "%.3f"|format(r.ak_kumulatif) if r.ak_kumulatif is not none else "-" }}</td>
+      <td>{{ r.ak_target_jenjang if r.ak_target_jenjang is not none else "-" }}</td>
+      <td>
+        {% if r.kekurangan_jenjang is none %}-
+        {% elif r.kekurangan_jenjang <= 0 %}Cukup
+        {% else %}{{ "%.3f"|format(r.kekurangan_jenjang) }}
+        {% endif %}
+      </td>
+      <td>{{ r.keterangan or "-" }}</td>
+      <td>
+        {% if r.potensi_tahun %}
+          {{ r.potensi_tahun.get("Sangat Baik", "-") }} /
+          {{ r.potensi_tahun.get("Baik", "-") }} /
+          {{ r.potensi_tahun.get("Butuh Perbaikan", "-") }}
+        {% else %}-{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

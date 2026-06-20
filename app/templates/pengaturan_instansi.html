@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Pengaturan Instansi{% endblock %}
+{% block content %}
+<h2>Pengaturan Instansi</h2>
+<form method="post" action="/pengaturan/instansi" class="form-grid">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+  <label>Instansi (pemberi kerja, tampil di dokumen)</label>
+  <input type="text" name="instansi" value="{{ rows.get('instansi', '') }}">
+  <label>Kota (untuk "Ditetapkan di ...")</label>
+  <input type="text" name="kota" value="{{ rows.get('kota', '') }}">
+  <label>Instansi Pembina (dipakai untuk redaksi tembusan)</label>
+  <input type="text" name="instansi_pembina" value="{{ rows.get('instansi_pembina', '') }}">
+  <button type="submit">Simpan</button>
+</form>
+{% endblock %}

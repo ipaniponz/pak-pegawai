@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Terbitkan PAK{% endblock %}
+{% block content %}
+<h2>Terbitkan PAK - {{ pegawai.nama }}</h2>
+{% if error %}<div class="error">{{ error }}</div>{% endif %}
+
+{% if not periode_tersedia %}
+<p class="muted">Tidak ada periode berstatus "disetujui" yang belum dipakai PAK lain.</p>
+{% else %}
+<form method="post" action="/pegawai/{{ pegawai.id }}/penetapan-ak/baru" class="form-grid" style="max-width:650px">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token(request) }}">
+
+  <label>Pilih Periode (akan dijadikan satu masa penilaian)</label>
+  <table>
+    <thead><tr><th></th><th>Bulan/Tahun</th><th>Predikat</th><th>AK Terkonversi</th></tr></thead>
+    <tbody>
+      {% for p in periode_tersedia %}
+      <tr>
+        <td><input type="checkbox" name="periode_ids" value="{{ p.id }}"></td>
+        <td>{{ p.bulan }}/{{ p.tahun }}</td>
+        <td>{{ p.predikat_referensi.nama }}</td>
+        <td>{{ p.ak_terkonversi }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <label>Pejabat Penilai</label>
+  <select name="pejabat_penilai_id" required>
+    {% for pp in pejabat_list %}
+    <option value="{{ pp.id }}">{{ pp.nama }} - {{ pp.jabatan }}</option>
+    {% endfor %}
+  </select>
+
+  <label>Tanggal Penetapan</label>
+  <input type="date" name="tanggal_penetapan" required>
+
+  <label>AK Dasar (default 0, isi manual untuk jalur perpindahan jabatan)</label>
+  <input type="text" name="ak_dasar" value="0">
+
+  <label>AK JF Lama (default 0)</label>
+  <input type="text" name="ak_jf_lama" value="0">
+
+  <label>AK Penyesuaian/Penyetaraan (default 0)</label>
+  <input type="text" name="ak_penyesuaian" value="0">
+
+  <label>Kalimat Penutup (boleh diedit manual, wajib diisi)</label>
+  <textarea name="kalimat_penutup" rows="4" required>{{ kalimat_prefill }}</textarea>
+
+  <button type="submit">Terbitkan PAK</button>
+</form>
+{% endif %}
+{% endblock %}
